@@ -16,10 +16,75 @@
 | デバッグ表示         | コンソールに材料名との key マッチング情報を表示し、デバッグ可能に。例: `🧩 checking key: – 'マスカルポーネ' – undefined` |
 
 ---
+---
+
+## 🧾 レシピデータのJSONフォーマット
+
+`data/recipes.ts` に記述されている各レシピは、以下の構造を持つオブジェクトです：
+
+### 🔸 各フィールドの説明
+
+| フィールド名   | 型         | 説明 |
+|----------------|------------|------|
+| `id`           | `string`   | レシピの一意な識別子（URLや内部参照に使用） |
+| `title`        | `string`   | 表示用のレシピタイトル |
+| `category`     | `string`   | レシピの分類カテゴリ（例：焼き菓子、パン） |
+| `ingredients`  | `Array`    | 材料一覧。各要素は `{ key, label }` を持つオブジェクト |
+| `tools`        | `Array`    | 使用する器具一覧。構造は `ingredients` と同様 |
+| `steps`        | `string[]` | 調理手順の配列。各要素が1ステップに対応 |
+
+---
+
+### 🧾 レシピ定義の例：**食パン**
+
+```ts
+{
+  id: 'shokupan',
+  title: '食パン',
+  category: 'パン',
+  ingredients: [
+    { key: '強力粉', label: '強力粉 250g' },
+    { key: '砂糖', label: '砂糖 20g' },
+    { key: '塩', label: '塩 4g' },
+    { key: 'ドライイースト', label: 'ドライイースト 3g' },
+    { key: '牛乳', label: '牛乳 180ml' },
+    { key: 'バター', label: 'バター 20g' }
+  ],
+  tools: [
+    { key: 'ボウル', label: 'ボウル' },
+    { key: 'ゴムベラ', label: 'ゴムベラ' },
+    { key: '計量スプーン', label: '計量スプーン' },
+    { key: '計量カップ', label: '計量カップ' },
+    { key: 'オーブン', label: 'オーブン' },
+    { key: '食パン型', label: '食パン型（パウンド型でも可）' }
+  ],
+  steps: [
+    'ボウルに強力粉、砂糖、塩、ドライイーストを入れ、全体をよく混ぜる。',
+    '牛乳を人肌に温めて加え、ゴムベラで混ぜて生地をまとめる。',
+    '生地がまとまったら台に出してこね、バターを加えてさらに10分ほどこねる。',
+    '生地を丸めてボウルに戻し、ラップをして温かい場所で約1時間発酵させる（2倍の大きさになるまで）。',
+    'ガス抜きをして丸め直し、型に入れて2次発酵（約30〜40分）させる。',
+    '180℃に予熱したオーブンで30分ほど焼く。',
+    '焼き上がったら型から外し、粗熱を取る。'
+  ]
+},
+
+---
 
 ## 📂 ディレクトリ構成（Ver-1）
 
-alt-recipe-demo/ ├── pages/ │ ├── api/ │ │ └── gpt.ts # OpenAI APIとの通信を行うエンドポイント │ └── index.tsx # レシピ選択とUIの統合画面（Page Tsx Alt Recipe） ├── data/ │ └── recipes.ts # レシピデータ（カテゴリ/材料/器具/手順） ├── tailwind.config.js # Tailwind CSS の設定ファイル ├── postcss.config.js # PostCSS 設定 ├── .env.local # OpenAI API Key等の環境変数（Git除外） ├── package.json ├── tsconfig.json
+alt-recipe-demo/
+├── pages/
+│   ├── api/
+│   │   └── gpt.ts         # OpenAI APIとの通信を行うエンドポイント
+│   └── index.tsx          # レシピ選択とUIの統合画面（Page Tsx Alt Recipe）
+├── data/
+│   └── recipes.ts         # レシピデータ（カテゴリ/材料/器具/手順）
+├── tailwind.config.js     # Tailwind CSS の設定ファイル
+├── postcss.config.js      # PostCSS 設定
+├── .env.local             # OpenAI API Key等の環境変数（Git除外）
+├── package.json
+├── tsconfig.json
 
 
 ---
