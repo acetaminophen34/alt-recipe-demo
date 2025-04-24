@@ -38,8 +38,8 @@ export default function Home() {
     return `
 以下のレシピの調理手順を、持っていない材料や器具に合わせて必要な箇所だけ書き換えてください。
 
-- 変更不要な手順はそのまま番号付きで再出力してください。
-- 変更がある手順のみ書き換えてください。
+- 内容が完全に同じ手順は、言い換えずにそのまま出力してください。
+- 変更がある場合のみ、その箇所だけを明確に変更してください。
 - 手順は「1. 手順文」の形式で出力してください。
 - 手順のあとに「【代替材料・器具】」というセクションを作り、以下の形式でリストしてください：
 必ずすべての代替材料に対して、g や ml などの単位つきで具体的な使用量を明記してください。
@@ -93,8 +93,9 @@ ${stepText}
   return (
     <main className="p-6 max-w-2xl mx-auto">
       <div className="bg-orange-50 rounded-xl shadow-inner p-4">
-        <select
-          className="mb-6 border rounded px-3 py-1"
+        <div className="mb-6">
+          <label className="block text-orange-600 font-semibold mb-2">レシピを選択：</label>
+          <select className="border border-orange-300 rounded px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
           value={selectedRecipeId}
           onChange={(e) => setSelectedRecipeId(e.target.value)}
         >
@@ -102,6 +103,7 @@ ${stepText}
             <option key={r.id} value={r.id}>{r.title}</option>
           ))}
         </select>
+        </div>
 
         <section className="border-b border-orange-200 pb-4 mb-6">
           <h2 className="text-xl font-semibold text-orange-500 mb-3">🥣 材料</h2>
