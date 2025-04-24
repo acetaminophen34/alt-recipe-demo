@@ -139,8 +139,8 @@ ${stepText}
       <div className="bg-orange-50 rounded-xl shadow-inner p-4">
       <h1 className="text-3xl font-bold text-orange-600 mb-6 tracking-wide">ティラミスのレシピ</h1>
 
-      <section>
-        <h2 className="text-xl font-semibold text-orange-500 mt-6 mb-2">🥣 材料</h2>
+      <section className="border-b border-orange-200 pb-4 mb-6">
+        <h2 className="text-xl font-semibold text-orange-500 mb-3">🥣 材料</h2>
         <ul className="space-y-2">
           {ingredients.map(({ key, label }) => {
             const matchedKey = Object.keys(substitutions).find(k => k.includes(key));
@@ -168,11 +168,11 @@ ${stepText}
         </ul>
       </section>
 
-      <section>
-        <h2 className="text-xl font-semibold text-orange-500 mt-6 mb-2">🔧 器具</h2>
+      <section className="border-b border-orange-200 pb-4 mb-6">
+        <h2 className="text-xl font-semibold text-orange-500 mb-3">🔧 器具</h2>
         <ul className="space-y-2">
           {tools.map(({ key, label }) => {
-            const matchedKey = Object.keys(substitutions).find(k => key.includes(k));
+            const matchedKey = Object.keys(substitutions).find(k => k.includes(key));
             return (
               <li key={key}>
                 <label className="flex flex-col space-y-1">
@@ -197,20 +197,20 @@ ${stepText}
         </ul>
       </section>
 
-      {(missingIngredients.length > 0 || missingTools.length > 0) && (
-        <div className="mt-6">
+      <div className="border-b border-orange-200 pb-6 mb-6">
+        <div className="mt-4">
           <button
             onClick={handleClick}
             className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-6 py-2 rounded-full shadow-md transition-colors duration-300 disabled:opacity-50"
-            disabled={loading}
+            disabled={missingIngredients.length === 0 && missingTools.length === 0 || loading}
           >
             {loading ? '🍳 取得中...' : '🍰 代替案を表示'}
           </button>
         </div>
-      )}
+      </div>
 
-      <section>
-        <h2 className="text-xl font-semibold text-orange-500 mt-6 mb-2">👩‍🍳 手順</h2>
+      <section className="border-b border-orange-200 pb-4 mb-6">
+        <h2 className="text-xl font-semibold text-orange-500 mb-3">👩‍🍳 手順</h2>
         <ol className="list-decimal pl-6 space-y-2">
           {steps.map((step, i) => {
             const updated = updatedSteps[i];
@@ -229,12 +229,13 @@ ${stepText}
           })}
         </ol>
       </section>
+      </div>
 
-              {loading && <p className="mt-4 text-gray-500">代替手順を取得中...</p>}
+      {loading && <p className="mt-4 text-gray-500">代替手順を取得中...</p>}
 
-        <section className="mt-10 border-t pt-6 text-sm text-gray-600">
+      <section className="mt-16 pt-10 text-sm text-gray-600">
         <h2 className="font-semibold mb-2">デバッグ出力</h2>
-        <div className="bg-gray-100 p-4 rounded space-y-4">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-4">
           <div>
             <p className="font-medium mb-1">▼ 入力ログ（missingIngredients / missingTools）:</p>
             <pre className="whitespace-pre-wrap text-xs">
@@ -260,7 +261,6 @@ ${stepText}
           </div>
         </div>
       </section>
-          </div>
     </main>
   );
 }
