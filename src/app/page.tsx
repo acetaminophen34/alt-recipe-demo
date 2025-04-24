@@ -96,21 +96,21 @@ ${stepText}
         <div className="mb-6">
           <label className="block text-orange-600 font-semibold mb-2">レシピを選択：</label>
           <select className="border border-orange-300 rounded px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-  value={selectedRecipeId}
-  onChange={(e) => setSelectedRecipeId(e.target.value)}
->
-  {Array.from(new Set(recipes.map(r => r.category))).map(category => (
-    <optgroup key={category} label={category}>
-      {recipes
-        .filter(r => r.category === category)
-        .map(r => (
-          <option key={r.id} value={r.id}>
-            {r.title}
-          </option>
-        ))}
-    </optgroup>
-  ))}
-</select>
+            value={selectedRecipeId}
+            onChange={(e) => setSelectedRecipeId(e.target.value)}
+          >
+            {Array.from(new Set(recipes.map(r => r.category))).map(category => (
+              <optgroup key={category} label={category}>
+                {recipes
+                  .filter(r => r.category === category)
+                  .map(r => (
+                    <option key={r.id} value={r.id}>
+                      {r.title}
+                    </option>
+                  ))}
+              </optgroup>
+            ))}
+          </select>
         </div>
 
         <section className="border-b border-orange-200 pb-4 mb-6">
@@ -118,6 +118,7 @@ ${stepText}
           <ul className="space-y-2">
             {ingredients.map(({ key, label }) => {
               const matchedKey = Object.keys(substitutions).find(k => k.includes(key));
+              const [name, amount] = label.split(/\s+(?=[^\s]+$)/);
               return (
                 <li key={key}>
                   <label className="flex flex-col space-y-1">
@@ -128,7 +129,10 @@ ${stepText}
                         onChange={() => toggleMissing(key, 'ingredient')}
                         className="accent-pink-500"
                       />
-                      <span>{label}</span>
+                      <div className="flex justify-between w-full">
+                        <span className="w-1/2 text-left">{name}</span>
+                        <span className="w-1/2 text-left text-gray-600">{amount}</span>
+                      </div>
                     </div>
                     {matchedKey && substitutions[matchedKey] && (
                       <span className="text-sm text-green-700 ml-6">
@@ -146,7 +150,7 @@ ${stepText}
           <h2 className="text-xl font-semibold text-orange-500 mb-3">🔧 器具</h2>
           <ul className="space-y-2">
             {tools.map(({ key, label }) => {
-              const matchedKey = Object.keys(substitutions).find(k => key.includes(k));
+              const matchedKey = Object.keys(substitutions).find(k => k.includes(key));
               return (
                 <li key={key}>
                   <label className="flex flex-col space-y-1">
@@ -203,35 +207,36 @@ ${stepText}
             })}
           </ol>
         </section>
-      </div>
-          <section className="mt-16 pt-10 text-sm text-gray-600">
-        <h2 className="font-semibold mb-2">デバッグ出力</h2>
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-4">
-          <div>
-            <p className="font-medium mb-1">▼ 入力ログ（missingIngredients / missingTools）:</p>
-            <pre className="whitespace-pre-wrap text-xs">
-              <code>
-                missingIngredients: {JSON.stringify(missingIngredients, null, 2)}
-                missingTools: {JSON.stringify(missingTools, null, 2)}
-              </code>
-            </pre>
-          </div>
-          <div>
-            <p className="font-medium mb-1">▼ プロンプト:</p>
-            <pre className="whitespace-pre-wrap text-xs">
-              <code>{generatePrompt()}</code>
-            </pre>
-          </div>
-          <div>
-            <p className="font-medium mb-1">▼ GPTの手順出力:</p>
-            <div className="whitespace-pre-wrap text-xs">
-              {updatedSteps.map((line, i) => (
-                <div key={i}>{line}</div>
-              ))}
+
+        <section className="mt-16 pt-10 text-sm text-gray-600">
+          <h2 className="font-semibold mb-2">デバッグ出力</h2>
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-4">
+            <div>
+              <p className="font-medium mb-1">▼ 入力ログ（missingIngredients / missingTools）:</p>
+              <pre className="whitespace-pre-wrap text-xs">
+                <code>
+missingIngredients: {JSON.stringify(missingIngredients, null, 2)}
+missingTools: {JSON.stringify(missingTools, null, 2)}
+                </code>
+              </pre>
+            </div>
+            <div>
+              <p className="font-medium mb-1">▼ プロンプト:</p>
+              <pre className="whitespace-pre-wrap text-xs">
+                <code>{generatePrompt()}</code>
+              </pre>
+            </div>
+            <div>
+              <p className="font-medium mb-1">▼ GPTの手順出力:</p>
+              <div className="whitespace-pre-wrap text-xs">
+                {updatedSteps.map((line, i) => (
+                  <div key={i}>{line}</div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }
