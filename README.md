@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📘 Ver-1 仕様書：代換提案機能つきレシピサイト
 
-## Getting Started
+## 🌟 目的
+ユーザーが持っていない「材料・器具」をチェック式で選択し、AIを活用して代換案と手順の修正を提示するレシピ支援サイトを実装する。
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🧩 実装機能一覧
+
+| 機能名           | 内容 |
+|------------------|------|
+| 材料・器具リスト選択 | レシピ中に登場する材料や器具を一覧表示し、「持っていないもの」にチェックを入れる方式。 |
+| 代換案取得       | OpenAI API（`/api/gpt.ts`）に不足素材の情報を送信し、代換候補とそれに対応した手順の修正案を取得。 |
+| 代換表示         | レシピ中でマッチした材料・器具の下に「→ ○○で代用可能」と追記表示。 |
+| 手順書き換え     | 修正された手順がある場合、先に元のステップを打ち消し線で残し、新手順を下に表示。 |
+| デバッグ表示     | コンソールに材料名との key マッチング情報を表示し、デバッグ可能に。例: `🧩 checking key: – 'マスカルポーネ' – undefined` |
+
+---
+
+## 📂 ディレクトリ構成
+
+```
+alt-recipe-demo/
+├── pages/
+│   ├── api/
+│   │   └── gpt.ts        # OpenAI APIと連携するバックエンド
+│   └── index.tsx         # レシピ表示UI、チェックリスト、代換表示統合
+├── tailwind.config.js     # Tailwind CSS 設定
+├── postcss.config.js      # PostCSS 設定
+├── .env.local             # OpenAI_API_KEY などの環境変数（Git除外）
+├── package.json
+├── tsconfig.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🖼 使用技術スタック
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js + TypeScript**：SPA構成・型安全
+- **Tailwind CSS**：スタイル定義、`@tailwindcss/typography`使用
+- **OpenAI API**：材料・器具の代換案と手順変換のロジック提供
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🚧 現状の課題（Ver-1時点）
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `undefined`表示など、keyマッチング精度に改善余地あり
+- すべての材料が一括して同じ代換案に置き換われるバグを一時確認
+- フロントエンド側の代換案挿入位置ロジックが簡易である（構文解析は未実装）
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## ✅ 状況まとめ
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- 現時点でのプロトタイプは **「代換案提示→表示→手順書き換え」まで完了**
+- UI・動作検証済、Canvas上でも再現OK
+- Gitへ保存済み、以降の拡張・仕様分岐に備えて **Ver-1として確定**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
