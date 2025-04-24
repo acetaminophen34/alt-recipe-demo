@@ -136,10 +136,11 @@ ${stepText}
 
   return (
     <main className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">ティラミスのレシピ</h1>
+      <div className="bg-orange-50 rounded-xl shadow-inner p-4">
+      <h1 className="text-3xl font-bold text-orange-600 mb-6 tracking-wide">ティラミスのレシピ</h1>
 
       <section>
-        <h2 className="text-lg font-semibold mt-6 mb-2">材料</h2>
+        <h2 className="text-xl font-semibold text-orange-500 mt-6 mb-2">🥣 材料</h2>
         <ul className="space-y-2">
           {ingredients.map(({ key, label }) => {
             const matchedKey = Object.keys(substitutions).find(k => k.includes(key));
@@ -168,7 +169,7 @@ ${stepText}
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold mt-6 mb-2">器具</h2>
+        <h2 className="text-xl font-semibold text-orange-500 mt-6 mb-2">🔧 器具</h2>
         <ul className="space-y-2">
           {tools.map(({ key, label }) => {
             const matchedKey = Object.keys(substitutions).find(k => key.includes(k));
@@ -200,15 +201,16 @@ ${stepText}
         <div className="mt-6">
           <button
             onClick={handleClick}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-6 py-2 rounded-full shadow-md transition-colors duration-300 disabled:opacity-50"
+            disabled={loading}
           >
-            代替案を適用して手順を表示
+            {loading ? '🍳 取得中...' : '🍰 代替案を表示'}
           </button>
         </div>
       )}
 
       <section>
-        <h2 className="text-lg font-semibold mt-6 mb-2">手順</h2>
+        <h2 className="text-xl font-semibold text-orange-500 mt-6 mb-2">👩‍🍳 手順</h2>
         <ol className="list-decimal pl-6 space-y-2">
           {steps.map((step, i) => {
             const updated = updatedSteps[i];
@@ -237,7 +239,7 @@ ${stepText}
             <p className="font-medium mb-1">▼ 入力ログ（missingIngredients / missingTools）:</p>
             <pre className="whitespace-pre-wrap text-xs">
               <code>
-                missingIngredients: {JSON.stringify(missingIngredients, null, 2)}
+                missingIngredients: {JSON.stringify(missingIngredients, null, 2)}  
                 missingTools: {JSON.stringify(missingTools, null, 2)}
               </code>
             </pre>
@@ -258,6 +260,7 @@ ${stepText}
           </div>
         </div>
       </section>
+          </div>
     </main>
   );
 }
