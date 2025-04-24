@@ -96,13 +96,21 @@ ${stepText}
         <div className="mb-6">
           <label className="block text-orange-600 font-semibold mb-2">レシピを選択：</label>
           <select className="border border-orange-300 rounded px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-          value={selectedRecipeId}
-          onChange={(e) => setSelectedRecipeId(e.target.value)}
-        >
-          {recipes.map(r => (
-            <option key={r.id} value={r.id}>{r.title}</option>
-          ))}
-        </select>
+  value={selectedRecipeId}
+  onChange={(e) => setSelectedRecipeId(e.target.value)}
+>
+  {Array.from(new Set(recipes.map(r => r.category))).map(category => (
+    <optgroup key={category} label={category}>
+      {recipes
+        .filter(r => r.category === category)
+        .map(r => (
+          <option key={r.id} value={r.id}>
+            {r.title}
+          </option>
+        ))}
+    </optgroup>
+  ))}
+</select>
         </div>
 
         <section className="border-b border-orange-200 pb-4 mb-6">

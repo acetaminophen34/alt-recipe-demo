@@ -2,6 +2,7 @@ export const recipes = [
   {
     id: 'tiramisu',
     title: '本格ティラミス',
+    category: '冷たいスイーツ',
     ingredients: [
       { key: 'マスカルポーネ', label: 'マスカルポーネチーズ 200g' },
       { key: 'エスプレッソ', label: 'エスプレッソ 100ml' },
@@ -30,6 +31,7 @@ export const recipes = [
   {
     id: 'pancake',
     title: 'ふんわりパンケーキ',
+    category: '焼き菓子',
     ingredients: [
       { key: '小麦粉', label: '薄力粉 150g' },
       { key: '卵', label: '卵 1個' },
@@ -59,6 +61,7 @@ export const recipes = [
   {
     id: 'macaron',
     title: 'カラフルマカロン',
+    category: '焼き菓子',
     ingredients: [
       { key: 'アーモンドプードル', label: 'アーモンドプードル 100g' },
       { key: '粉砂糖', label: '粉砂糖 100g' },
@@ -88,6 +91,7 @@ export const recipes = [
   },
   {
     id: 'castella',
+    category: '焼き菓子',
     title: 'しっとりカステラ',
     ingredients: [
       { key: '卵', label: '卵 4個' },
@@ -114,6 +118,7 @@ export const recipes = [
   {
     id: 'chocolate_chip_cookie',
     title: 'チョコチップクッキー',
+    category: '焼き菓子',
     ingredients: [
       { key: '薄力粉', label: '薄力粉 150g' },
       { key: 'バター', label: '無塩バター 100g（常温）' },
@@ -141,6 +146,7 @@ export const recipes = [
   {
     id: 'creme_brulee',
     title: 'クレームブリュレ',
+    category: '冷たいスイーツ',
     ingredients: [
       { key: '生クリーム', label: '生クリーム 200ml' },
       { key: '牛乳', label: '牛乳 100ml' },
