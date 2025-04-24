@@ -57,7 +57,10 @@ export default function Home() {
 - 変更がある手順のみ書き換えてください。
 - 手順は「1. 手順文」の形式で出力してください。
 - 手順のあとに「【代替材料・器具】」というセクションを作り、以下の形式でリストしてください：
-  - エスプレッソ → インスタントコーヒー＋お湯
+必ずすべての代替材料に対して、g や ml などの単位つきで具体的な使用量を明記してください。
+形式の例：
+  - エスプレッソ → インスタントコーヒー（小さじ2）＋お湯（100ml）
+  - マスカルポーネ → クリームチーズ（100g）＋生クリーム（50ml）
 
 【持っていないもの】
 ${missingList}
@@ -78,7 +81,7 @@ ${stepText}
         for (const rawKey in parsed) {
           const cleanKey = rawKey
             .replace(/^['"]/, '')
-            .replace(/^[-–ー―\s\u3000]+/, '')
+            .replace(/^[-–ー―\s　]+/, '')
             .replace(/['"]$/, '')
             .trim();
           console.log('🧩 key整形:', rawKey, '→', cleanKey);
@@ -140,7 +143,6 @@ ${stepText}
         <ul className="space-y-2">
           {ingredients.map(({ key, label }) => {
             const matchedKey = Object.keys(substitutions).find(k => k.includes(key));
-            console.log('🧩 checking key:', key, '→', matchedKey, substitutions[matchedKey ?? '']);
             return (
               <li key={key}>
                 <label className="flex flex-col space-y-1">
@@ -226,7 +228,36 @@ ${stepText}
         </ol>
       </section>
 
-      {loading && <p className="mt-4 text-gray-500">代替手順を取得中...</p>}
+              {loading && <p className="mt-4 text-gray-500">代替手順を取得中...</p>}
+
+        <section className="mt-10 border-t pt-6 text-sm text-gray-600">
+        <h2 className="font-semibold mb-2">デバッグ出力</h2>
+        <div className="bg-gray-100 p-4 rounded space-y-4">
+          <div>
+            <p className="font-medium mb-1">▼ 入力ログ（missingIngredients / missingTools）:</p>
+            <pre className="whitespace-pre-wrap text-xs">
+              <code>
+                missingIngredients: {JSON.stringify(missingIngredients, null, 2)}
+                missingTools: {JSON.stringify(missingTools, null, 2)}
+              </code>
+            </pre>
+          </div>
+          <div>
+            <p className="font-medium mb-1">▼ プロンプト:</p>
+            <pre className="whitespace-pre-wrap text-xs">
+              <code>{generatePrompt()}</code>
+            </pre>
+          </div>
+          <div>
+            <p className="font-medium mb-1">▼ GPTの手順出力:</p>
+            <div className="whitespace-pre-wrap text-xs">
+              {updatedSteps.map((line, i) => (
+                <div key={i}>{line}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
