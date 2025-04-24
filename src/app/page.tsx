@@ -97,7 +97,13 @@ ${stepText}
           <label className="block text-orange-600 font-semibold mb-2">レシピを選択：</label>
           <select className="border border-orange-300 rounded px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
             value={selectedRecipeId}
-            onChange={(e) => setSelectedRecipeId(e.target.value)}
+            onChange={(e) => {
+              setSelectedRecipeId(e.target.value);
+              setMissingIngredients([]);
+              setMissingTools([]);
+              setUpdatedSteps([]);
+              setSubstitutions({});
+            }}
           >
             {Array.from(new Set(recipes.map(r => r.category))).map(category => (
               <optgroup key={category} label={category}>
