@@ -105,15 +105,15 @@ ${stepText}
               setSubstitutions({});
             }}
           >
-            {Array.from(new Set(recipes.map(r => r.category))).map(category => (
-              <optgroup key={category} label={category}>
-                {recipes
-                  .filter(r => r.category === category)
-                  .map(r => (
-                    <option key={r.id} value={r.id}>
-                      {r.title}
-                    </option>
-                  ))}
+            {Array.from(new Set(recipes.map(r => r.category.main))).map(main => (
+                <optgroup key={main} label={main}>
+                   {recipes
+                   .filter(r => r.category.main === main)
+                   .map(r => (
+                <option key={r.id} value={r.id}>
+                  {r.title}（{r.category.sub}）
+                </option>
+              ))}
               </optgroup>
             ))}
           </select>

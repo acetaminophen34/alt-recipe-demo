@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { recipes } from 'data/recipes';
 
@@ -23,6 +24,8 @@ export default function RecipePage() {
   const [updatedSteps, setUpdatedSteps] = useState<string[]>([]);
   const [substitutions, setSubstitutions] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const toggleMissing = (item: string, type: 'ingredient' | 'tool') => {
     const current = type === 'ingredient' ? missingIngredients : missingTools;
@@ -102,12 +105,12 @@ ${stepText}`;
   return (
     <main className="p-6 max-w-2xl mx-auto">
       <div className="mb-6">
-        <a
-          href="/recipes"
-          className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-800 font-semibold bg-orange-100 hover:bg-orange-200 px-4 py-2 rounded-md transition"
-        >
-          ← レシピ一覧に戻る
-        </a>
+      <button
+        onClick={() => router.back()}
+        className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-800 font-semibold bg-orange-100 hover:bg-orange-200 px-4 py-2 rounded-md transition"
+      >
+        ← レシピ一覧に戻る
+      </button>
       </div>
       <div className="bg-orange-50 rounded-xl shadow-inner p-4">
       <h1 className="text-2xl font-bold mb-6">{recipe.title}</h1>
