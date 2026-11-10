@@ -76,8 +76,8 @@ export interface ResolvedSubstitution {
   replacement: string | null;
   detail: string | null;
   stepNote: string | null;
-  /** どのエンジンが解決したか */
-  resolvedBy: "knowledge-base" | "llm" | "none";
+  /** どのエンジンが解決したか。"user" は利用者が「代わりにこれがある」と指定したもの */
+  resolvedBy: "knowledge-base" | "llm" | "none" | "user";
 }
 
 /** 書き換え前後の手順 */
@@ -98,4 +98,9 @@ export interface SubstituteRequest {
   recipe: Recipe;
   missingIngredients: string[];
   missingTools: string[];
+  /**
+   * 「代わりにこれがある」の指定。key = 材料・器具の key、value = 代わりに使うものの名前。
+   * 指定した項目は知識ベースの既定案ではなく、この値で代替案と手順書き換えを行う。
+   */
+  overrides?: Record<string, string>;
 }

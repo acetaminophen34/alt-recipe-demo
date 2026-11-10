@@ -346,6 +346,96 @@ export const substitutionKnowledgeBase: SubstitutionEntry[] = [
     stepNote: "省略する場合は煮汁が余るので、煮時間を少し延ばして調整。",
     stepWord: "糸こんにゃく",
   },
+  {
+    key: "豆腐",
+    aliases: ["木綿豆腐", "絹豆腐", "tofu"],
+    kind: "ingredient",
+    replacement: "厚揚げ（同量）",
+    detail: "厚揚げは水切り不要で煮崩れしにくい。炒め物・煮物向き。油揚げを刻んでも代用できる。",
+    stepNote: "厚揚げは崩れにくいので、下ゆでなしでそのまま使える。",
+    stepWord: "厚揚げ",
+  },
+  {
+    key: "豚バラ肉",
+    aliases: ["豚バラ", "pork belly"],
+    kind: "ingredient",
+    replacement: "豚こま切れ肉（同量）",
+    detail: "脂は少なくなるが、炒め物・煮物はそのまま作れる。豚ロース薄切りでも可。",
+    stepNote: "豚こま切れ肉は火が通りやすいので、炒めすぎて固くしないよう注意。",
+    stepWord: "豚こま切れ肉",
+  },
+  {
+    key: "豚こま切れ肉",
+    aliases: ["豚こま", "豚小間切れ"],
+    kind: "ingredient",
+    replacement: "豚バラ肉（同量）",
+    detail: "バラ肉は脂が増えてコクが出る。あっさりさせたい場合は豚ロース薄切りでも可。",
+    stepNote: "豚バラ肉は脂が出るので、炒め油は少し減らすとよい。",
+    stepWord: "豚バラ肉",
+  },
+  {
+    key: "合いびき肉",
+    aliases: ["ひき肉", "豚ひき肉", "合い挽き肉", "ground meat", "minced meat"],
+    kind: "ingredient",
+    replacement: "豚ひき肉（同量）",
+    detail: "豚ひき肉だけでも成立する。鶏ひき肉ならあっさり仕上がり、つなぎを少し増やすとまとまりがよい。",
+    stepNote: "鶏ひき肉を使う場合は火が通りやすいので、焼き時間は短めに調整する。",
+    stepWord: "豚ひき肉",
+  },
+  {
+    key: "豆板醤",
+    aliases: ["トウバンジャン", "chili bean paste"],
+    kind: "ingredient",
+    replacement: "コチュジャン（同量）、または味噌小さじ2＋一味唐辛子少々",
+    detail: "コチュジャンは甘みがあるので、砂糖を使う料理では少し控えめに。辛さは一味で調整できる。",
+    stepNote: "コチュジャンは焦げやすいので、香り出しの炒めは短時間に。",
+    stepWord: "コチュジャン",
+  },
+  {
+    key: "キャベツ",
+    aliases: ["cabbage"],
+    kind: "ingredient",
+    replacement: "白菜（同量）",
+    detail: "白菜は水分が多いので、炒め物は強火で短時間に。レタスは加熱が最後のさっと炒めなら使える。",
+    stepNote: "白菜は水気が出やすいので、味付けは最後に調整する。",
+    stepWord: "白菜",
+  },
+  {
+    key: "ニラ",
+    aliases: ["にら", "chinese chives"],
+    kind: "ingredient",
+    replacement: "長ねぎ（同量）",
+    detail: "香りの系統は変わるが、餃子や炒め物は成立する。青ねぎや細ねぎでも可で、細ねぎが香りは近い。",
+    stepNote: "ねぎは火が通りやすいので、加えるタイミングはニラより少し遅らせる。",
+    stepWord: "長ねぎ",
+  },
+  {
+    key: "パン粉",
+    aliases: ["breadcrumbs", "panko"],
+    kind: "ingredient",
+    replacement: "食パンをすりおろした生パン粉（同量）",
+    detail: "耳を除いた食パンをおろし金やフードプロセッサーで細かくする。麩を砕いても代用できる。",
+    stepNote: "生パン粉は水分を含むので、つなぎに使う場合は牛乳を少し減らす。",
+    stepWord: "生パン粉",
+  },
+  {
+    key: "ピザ用チーズ",
+    aliases: ["シュレッドチーズ", "とろけるチーズ", "cheese"],
+    kind: "ingredient",
+    replacement: "スライスチーズ（2〜3枚をちぎってのせる）",
+    detail: "とろけるタイプのスライスチーズが近い。粉チーズだけなら量を増やしてコクを補う。",
+    stepNote: "スライスチーズは焼き色がつきにくいので、焼き時間は少し長めに。",
+    stepWord: "スライスチーズ",
+  },
+  {
+    key: "ごま油",
+    aliases: ["sesame oil"],
+    kind: "ingredient",
+    replacement: "サラダ油（同量）",
+    detail: "香りはなくなるが、調理油としては問題ない。仕上げの香りが欲しい場合はラー油を数滴でも雰囲気が変わる。",
+    stepNote: "ごま油の風味付けは効かなくなるので、ねぎや生姜などの香味を少し強めにするとよい。",
+    stepWord: "サラダ油",
+  },
   // ================= 器具 =================
   {
     key: "ハンドミキサー",
@@ -534,4 +624,34 @@ export function lookupSubstitution(
     }
   }
   return null;
+}
+
+/**
+ * 「代わりにこれがある」の候補リストを KB から作る。
+ * KB の replacement は1文字列なので、「または」区切りと stepWord から
+ * 選択肢らしい語を取り出して最大4件返す。KB にない項目は空配列。
+ * 例: 牛乳 → ["豆乳"]、バター → ["サラダ油", "オリーブオイル"]
+ */
+export function getSubstitutionCandidates(
+  name: string,
+  kind?: "ingredient" | "tool",
+): string[] {
+  const entry = lookupSubstitution(name, kind);
+  if (!entry) return [];
+  const parts = entry.replacement
+    .split(/または|、/)
+    .map((s) =>
+      s
+        .replace(/（.*?）/g, "")
+        .replace(/\(.*?\)/g, "")
+        .replace(/^.*?＝/, "")
+        .trim(),
+    )
+    .filter((s) => s.length > 0 && s.length <= 20);
+  const list: string[] = [];
+  if (entry.stepWord && entry.stepWord.length <= 8) list.push(entry.stepWord);
+  for (const p of parts) {
+    if (!list.includes(p)) list.push(p);
+  }
+  return list.slice(0, 4);
 }

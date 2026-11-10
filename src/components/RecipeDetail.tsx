@@ -4,12 +4,19 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { Recipe, RecipeItem, SubstituteResponse } from "@/lib/types";
 import { runLocalEngine } from "@/lib/engine/substitute";
+import { getSubstitutionCandidates } from "@/lib/data/substitutions";
 
 type ItemKind = "ingredient" | "tool";
+
+/** 自由入力を選んだときの select の値 */
+const CUSTOM_CHOICE = "__custom__";
 
 export default function RecipeDetail({ recipe }: { recipe: Recipe }) {
   const [missingIngredients, setMissingIngredients] = useState<string[]>([]);
   const [missingTools, setMissingTools] = useState<string[]>([]);
+  // 「代わりにこれがある」の指定状態（item.key 単位）
+  const [choiceByKey, setChoiceByKey] = useState<Record<string, string>>({});
+  const [customByKey, setCustomByKey] = useState<Record<string, string>>({});
   const [result, setResult] = useState<SubstituteResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,9 +28,50 @@ export default function RecipeDetail({ recipe }: { recipe: Recipe }) {
       kind === "ingredient"
         ? ([missingIngredients, setMissingIngredients] as const)
         : ([missingTools, setMissingTools] as const);
-    setter(list.includes(key) ? list.filter((k) => k !== key) : [...list, key]);
+    const isMissing = list.includes(key);
+    setter(isMissing ? list.filter((k) => k !== key) : [...list, key]);
+    if (isMissing) {
+      // チェックを外したら、その項目の代用指定も消す
+      setChoiceByKey((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+      setCustomByKey((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    }
     setResult(null);
     setError(null);
+  };
+
+  const setChoice = (key: string, value: string) => {
+    setChoiceByKey((prev) => ({ ...prev, [key]: value }));
+    setResult(null);
+    setError(null);
+  };
+
+  const setCustom = (key: string, value: string) => {
+    setCustomByKey((prev) => ({ ...prev, [key]: value }));
+    setResult(null);
+    setError(null);
+  };
+
+  /** 現在の選択状態から、エンジンに渡す overrides（item.key → 代わりに使うもの）を組み立てる */
+  const buildOverrides = (): Record<string, string> => {
+    const overrides: Record<string, string> = {};
+    for (const key of [...missingIngredients, ...missingTools]) {
+      const choice = choiceByKey[key] ?? "";
+      if (choice === CUSTOM_CHOICE) {
+        const text = (customByKey[key] ?? "").trim();
+        if (text) overrides[key] = text;
+      } else if (choice) {
+        overrides[key] = choice;
+      }
+    }
+    return overrides;
   };
 
   const runSubstitution = () => {
@@ -31,7 +79,7 @@ export default function RecipeDetail({ recipe }: { recipe: Recipe }) {
     setError(null);
     try {
       // 静的エクスポート版: サーバーAPIを介さず、ブラウザ内でローカルエンジンを直接実行する
-      setResult(runLocalEngine(recipe, missingIngredients, missingTools));
+      setResult(runLocalEngine(recipe, missingIngredients, missingTools, buildOverrides()));
     } catch {
       setError("代替案の取得に失敗しました。もう一度お試しください。");
     } finally {
@@ -50,6 +98,8 @@ export default function RecipeDetail({ recipe }: { recipe: Recipe }) {
       {items.map((item) => {
         const isMissing = missing.includes(item.key);
         const sub = result ? subByKey.get(`${kind}:${item.key}`) : undefined;
+        const candidates = isMissing ? getSubstitutionCandidates(item.key, kind) : [];
+        const choice = choiceByKey[item.key] ?? "";
         return (
           <li key={item.key} className="py-2.5">
             <label className="flex cursor-pointer items-start gap-3">
@@ -59,41 +109,79 @@ export default function RecipeDetail({ recipe }: { recipe: Recipe }) {
                 onChange={() => toggle(item.key, kind)}
                 className="mt-0.5 h-5 w-5 shrink-0 accent-orange-600"
               />
-              <span className="min-w-0 flex-1">
-                <span className="flex flex-wrap items-center gap-2">
-                  <span
-                    className={`font-medium ${isMissing ? "text-stone-400 line-through decoration-orange-300" : "text-stone-800"}`}
-                  >
-                    {item.label}
-                  </span>
-                  {isMissing ? (
-                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
-                      ない
-                    </span>
-                  ) : (
-                    <span className="rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-semibold text-green-700 ring-1 ring-green-200">
-                      ✓ 使える
-                    </span>
-                  )}
+              <span className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                <span
+                  className={`font-medium ${isMissing ? "text-stone-400 line-through decoration-orange-300" : "text-stone-800"}`}
+                >
+                  {item.label}
                 </span>
-                {isMissing && sub && (
-                  <span className="mt-1.5 block rounded-lg bg-orange-50 px-3 py-2 text-sm leading-relaxed text-stone-700 ring-1 ring-orange-100">
-                    {sub.replacement ? (
-                      <>
-                        <span className="font-semibold text-orange-700">
-                          → {sub.replacement}
-                        </span>
-                        {sub.detail && <span className="mt-0.5 block text-stone-600">{sub.detail}</span>}
-                      </>
-                    ) : (
-                      <span className="font-semibold text-red-600">
-                        代替案が見つかりませんでした。買い足すか、別のレシピをご検討ください。
-                      </span>
-                    )}
+                {isMissing ? (
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                    ない
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-semibold text-green-700 ring-1 ring-green-200">
+                    ✓ 使える
                   </span>
                 )}
               </span>
             </label>
+
+            {isMissing && (
+              <div className="ml-8 mt-2 rounded-lg bg-stone-50 px-3 py-2 ring-1 ring-stone-200">
+                <span className="text-xs font-semibold text-stone-500">
+                  代わりにこれがある（任意）
+                </span>
+                <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                  <select
+                    value={choice}
+                    onChange={(e) => setChoice(item.key, e.target.value)}
+                    className="max-w-full rounded-md bg-white px-2 py-1.5 text-sm text-stone-700 ring-1 ring-stone-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    aria-label={`${item.key}の代わりにあるもの`}
+                  >
+                    <option value="">おまかせ（おすすめの代替案）</option>
+                    {candidates.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                    <option value={CUSTOM_CHOICE}>自分で入力する</option>
+                  </select>
+                  {choice === CUSTOM_CHOICE && (
+                    <input
+                      type="text"
+                      value={customByKey[item.key] ?? ""}
+                      onChange={(e) => setCustom(item.key, e.target.value)}
+                      placeholder="例：豚こま切れ肉"
+                      className="min-w-40 flex-1 rounded-md bg-white px-2 py-1.5 text-sm text-stone-700 ring-1 ring-stone-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                      aria-label={`${item.key}の代わりにあるものを入力`}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+
+            {isMissing && sub && (
+              <div className="ml-8 mt-1.5 rounded-lg bg-orange-50 px-3 py-2 text-sm leading-relaxed text-stone-700 ring-1 ring-orange-100">
+                {sub.replacement ? (
+                  <>
+                    <span className="font-semibold text-orange-700">
+                      → {sub.replacement}
+                    </span>
+                    {sub.resolvedBy === "user" && (
+                      <span className="ml-2 rounded-full bg-sky-100 px-2 py-0.5 text-[11px] font-semibold text-sky-700">
+                        指定したもの
+                      </span>
+                    )}
+                    {sub.detail && <span className="mt-0.5 block text-stone-600">{sub.detail}</span>}
+                  </>
+                ) : (
+                  <span className="font-semibold text-red-600">
+                    代替案が見つかりませんでした。買い足すか、別のレシピをご検討ください。
+                  </span>
+                )}
+              </div>
+            )}
           </li>
         );
       })}
@@ -123,6 +211,11 @@ export default function RecipeDetail({ recipe }: { recipe: Recipe }) {
             <span className="rounded-full bg-stone-100 px-3 py-1 text-stone-600">
               {recipe.category.sub}
             </span>
+            {recipe.servings && (
+              <span className="rounded-full bg-stone-100 px-3 py-1 text-stone-600">
+                {recipe.servings}
+              </span>
+            )}
             {recipe.source === "mealdb" && (
               <span className="rounded-full bg-sky-50 px-3 py-1 text-sky-700 ring-1 ring-sky-200">
                 TheMealDB のレシピ（手順は英語）
@@ -135,6 +228,7 @@ export default function RecipeDetail({ recipe }: { recipe: Recipe }) {
           <p className="mt-2 text-sm leading-relaxed text-stone-500">
             持っていないものにチェックを入れて「代替案を表示」を押すと、代わりになるものと書き換えた手順を提案します。
             チェックしていないものは「今使えるもの」として表示されます。
+            「これがないけど、代わりにこれがある」という場合は、チェックした項目の下で手元にあるものを指定できます。
           </p>
           {recipe.sourceUrl && (
             <a
